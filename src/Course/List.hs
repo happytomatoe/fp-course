@@ -76,8 +76,10 @@ headOr ::
   a
   -> List a
   -> a
-headOr =
-  error "todo: Course.List#headOr"
+headOr def list = 
+  case list of 
+    Nil -> def
+    (h :. t) -> h
 
 -- | The product of the elements of a list.
 --
@@ -92,8 +94,7 @@ headOr =
 product ::
   List Int
   -> Int
-product =
-  error "todo: Course.List#product"
+product = foldLeft (*) 1
 
 -- | Sum the elements of the list.
 --
@@ -107,8 +108,7 @@ product =
 sum ::
   List Int
   -> Int
-sum =
-  error "todo: Course.List#sum"
+sum = foldLeft (+) 0
 
 -- | Return the length of the list.
 --
@@ -119,8 +119,9 @@ sum =
 length ::
   List a
   -> Int
-length =
-  error "todo: Course.List#length"
+length l = case l of  
+   Nil -> 0
+   (h :. t) -> 1 + length t
 
 -- | Map the given function on each element of the list.
 --
@@ -134,8 +135,9 @@ map ::
   (a -> b)
   -> List a
   -> List b
-map =
-  error "todo: Course.List#map"
+map f l = case l of 
+   Nil -> Nil
+   (h :. t) -> f h :. map f t
 
 -- | Return elements satisfying the given predicate.
 --
@@ -151,8 +153,9 @@ filter ::
   (a -> Bool)
   -> List a
   -> List a
-filter =
-  error "todo: Course.List#filter"
+filter f l = case l of 
+   Nil -> Nil
+   (h :. t) -> if f h then h :. filter f t else filter f t
 
 -- | Append two lists to a new list.
 --
@@ -170,8 +173,14 @@ filter =
   List a
   -> List a
   -> List a
-(++) =
-  error "todo: Course.List#(++)"
+(++) l1 l2 =  
+  -- delete last element from 1-st list and append all elems from 2-nd list
+  case (l2,l2) of 
+    (Nil,Nil) -> Nil
+    ((h :. t), Nil) -> h :. (t ++ Nil) 
+    (Nil,(h :. t)) -> h :. (Nil ++ t)
+    ((h1 :. t1),(h2 :. t2)) -> h1 :. (t1 ++ l2)
+    
 
 infixr 5 ++
 
