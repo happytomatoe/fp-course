@@ -175,7 +175,7 @@ filter f l = case l of
   -> List a
 (++) l1 l2 =  
   -- delete last element from 1-st list and append all elems from 2-nd list
-  case (l2,l2) of 
+  case (l1,l2) of 
     (Nil,Nil) -> Nil
     ((h :. t), Nil) -> h :. (t ++ Nil) 
     (Nil,(h :. t)) -> h :. (Nil ++ t)
@@ -197,8 +197,7 @@ infixr 5 ++
 flatten ::
   List (List a)
   -> List a
-flatten =
-  error "todo: Course.List#flatten"
+flatten = foldLeft (++) Nil
 
 -- | Map a function then flatten to a list.
 --
@@ -214,8 +213,7 @@ flatMap ::
   (a -> List b)
   -> List a
   -> List b
-flatMap =
-  error "todo: Course.List#flatMap"
+flatMap f l = flatten . map (f) $ l 
 
 -- | Flatten a list of lists to a list (again).
 -- HOWEVER, this time use the /flatMap/ function that you just wrote.
@@ -224,8 +222,7 @@ flatMap =
 flattenAgain ::
   List (List a)
   -> List a
-flattenAgain =
-  error "todo: Course.List#flattenAgain"
+flattenAgain = flatMap (\x -> x)
 
 -- | Convert a list of optional values to an optional list of values.
 --
@@ -249,8 +246,13 @@ flattenAgain =
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional =
+seqOptional l =
   error "todo: Course.List#seqOptional"
+  -- case l of 
+  --   Nil -> Full Nil 
+  --   (h :. t) ->  case h of 
+  --                   Full a -> h :. q where q = seqOptional t
+  --                   Empty -> Empty
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -272,8 +274,9 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find =
-  error "todo: Course.List#find"
+find f l = case l of 
+   Nil -> Empty
+   (h :. t) -> if f h then Full h else find f t
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -288,11 +291,17 @@ find =
 --
 -- >>> lengthGT4 infinity
 -- True
-lengthGT4 ::
-  List a
-  -> Bool
-lengthGT4 =
-  error "todo: Course.List#lengthGT4"
+-- lengthGT4Inner :: List a -> Int -> Int
+lengthGT4Inner l n = case l of 
+    Nil -> 0
+    (h :. t) -> if n > 0 then 1 + lengthGT4Inner t (n-1)  else 0
+lengthGT4 ::  List a -> Bool
+lengthGT4 l = lengthGT4Inner l 5 > 4 
+
+
+
+
+
 
 -- | Reverse a list.
 --
