@@ -76,10 +76,8 @@ headOr ::
   a
   -> List a
   -> a
-headOr def list = 
-  case list of 
-    Nil -> def
-    (h :. t) -> h
+headOr def Nil =  def
+headOr _ (h :. t) = h
 
 -- | The product of the elements of a list.
 --
@@ -246,13 +244,20 @@ flattenAgain = flatMap (\x -> x)
 seqOptional ::
   List (Optional a)
   -> Optional (List a)
-seqOptional l =
-  error "todo: Course.List#seqOptional"
-  -- case l of 
-  --   Nil -> Full Nil 
-  --   (h :. t) ->  case h of 
-  --                   Full a -> h :. q where q = seqOptional t
-  --                   Empty -> Empty
+seqOptional Nil = Full Nil
+seqOptional (h:.t) = case h of 
+  Full a -> 
+    case seqOptional t of 
+      Empty -> Empty
+      Full b -> Full (a :. b)
+  Empty -> Empty 
+
+--  case find (\x -> case x of 
+--         Empty -> True 
+--         Full a -> False) l of 
+--     Full a -> Empty
+--     Empty -> Full e where   
+--       e = map (\x -> case x of Full a -> a) l 
 
 -- | Find the first element in the list matching the predicate.
 --
@@ -274,9 +279,8 @@ find ::
   (a -> Bool)
   -> List a
   -> Optional a
-find f l = case l of 
-   Nil -> Empty
-   (h :. t) -> if f h then Full h else find f t
+find f Nil = Empty 
+find f (h :. t) = if f h then Full h else find f t
 
 -- | Determine if the length of the given list is greater than 4.
 --
@@ -292,16 +296,10 @@ find f l = case l of
 -- >>> lengthGT4 infinity
 -- True
 -- lengthGT4Inner :: List a -> Int -> Int
-lengthGT4Inner l n = case l of 
-    Nil -> 0
-    (h :. t) -> if n > 0 then 1 + lengthGT4Inner t (n-1)  else 0
+lengthGT4Inner Nil n =  0
+lengthGT4Inner (h :. t) n = if n > 0 then 1 + lengthGT4Inner t (n-1)  else 0
 lengthGT4 ::  List a -> Bool
 lengthGT4 l = lengthGT4Inner l 5 > 4 
-
-
-
-
-
 
 -- | Reverse a list.
 --
@@ -317,9 +315,12 @@ lengthGT4 l = lengthGT4Inner l 5 > 4
 reverse ::
   List a
   -> List a
-reverse =
-  error "todo: Course.List#reverse"
-
+reverse Nil = Nil
+reverse (h:.t) = 
+  error ""
+  --TODO: improve performance for large list
+  --  reverse t   h :. Nil
+   
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
 --
