@@ -42,10 +42,7 @@ instance Functor ExactlyOne where
     -> ExactlyOne a
     -> ExactlyOne b
   (<$>) = mapExactlyOne 
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 -- | Maps a function on the List functor.
 --
 -- >>> (+1) <$> Nil
