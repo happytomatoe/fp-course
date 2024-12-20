@@ -154,8 +154,7 @@ lift2 ::
   -> k a
   -> k b
   -> k c
-lift2 =
-  error "todo: Course.Applicative#lift2"
+lift2 f a b = ((pure f) <*> a) <*> b
 
 -- | Apply a ternary function in the environment.
 -- /can be written using `lift2` and `(<*>)`./
@@ -187,8 +186,7 @@ lift3 ::
   -> k b
   -> k c
   -> k d
-lift3 =
-  error "todo: Course.Applicative#lift3"
+lift3 f a b c = ((pure f) <*> a) <*> b <*> c
 
 -- | Apply a quaternary function in the environment.
 -- /can be written using `lift3` and `(<*>)`./
@@ -221,16 +219,14 @@ lift4 ::
   -> k c
   -> k d
   -> k e
-lift4 =
-  error "todo: Course.Applicative#lift4"
+lift4 f a b c d  = ((pure f) <*> a) <*> b <*> c <*> d
 
 -- | Apply a nullary function in the environment.
 lift0 ::
   Applicative k =>
   a
   -> k a
-lift0 =
-  error "todo: Course.Applicative#lift0"
+lift0 = pure 
 
 -- | Apply a unary function in the environment.
 -- /can be written using `lift0` and `(<*>)`./
@@ -248,8 +244,7 @@ lift1 ::
   (a -> b)
   -> k a
   -> k b
-lift1 =
-  error "todo: Course.Applicative#lift1"
+lift1 f a = lift0 f <*> a
 
 -- | Apply, discarding the value of the first argument.
 -- Pronounced, right apply.
@@ -274,8 +269,7 @@ lift1 =
   k a
   -> k b
   -> k b
-(*>) =
-  error "todo: Course.Applicative#(*>)"
+(*>) b c = pure (\_ z -> z) <*> b <*> c
 
 -- | Apply, discarding the value of the second argument.
 -- Pronounced, left apply.
@@ -300,8 +294,7 @@ lift1 =
   k b
   -> k a
   -> k b
-(<*) =
-  error "todo: Course.Applicative#(<*)"
+(<*) b c = pure (\a _ -> a) <*> b <*> c
 
 -- | Sequences a list of structures to a structure of list.
 --
