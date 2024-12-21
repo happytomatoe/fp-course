@@ -315,11 +315,10 @@ lengthGT4 l = lengthGT4Inner l 5 > 4
 reverse ::
   List a
   -> List a
-reverse Nil = Nil
-reverse (h:.t) = 
-  error ""
+reverse _ = error "Not implemented"
+-- reverse Nil = Nil
+-- reverse (h:.t) = reverse t ++  h :. Nil
   --TODO: improve performance for large list
-  --  reverse t   h :. Nil
    
 -- | Produce an infinite `List` that seeds with the given value at its head,
 -- then runs the given function for subsequent elements
@@ -333,8 +332,9 @@ produce ::
   (a -> a)
   -> a
   -> List a
-produce f x =
-  error "todo: Course.List#produce"
+produce f t =   
+  let inf x = x :. inf (f x)
+  in inf t
 
 -- | Do anything other than reverse a list.
 -- Is it even possible?

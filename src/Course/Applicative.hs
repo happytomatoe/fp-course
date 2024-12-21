@@ -316,8 +316,7 @@ sequence ::
   Applicative k =>
   List (k a)
   -> k (List a)
-sequence =
-  error "todo: Course.Applicative#sequence"
+sequence = error "Sequence"
 
 -- | Replicate an effect a given number of times.
 --
@@ -342,8 +341,8 @@ replicateA ::
   Int
   -> k a
   -> k (List a)
-replicateA =
-  error "todo: Course.Applicative#replicateA"
+-- TODO: add list permutation
+replicateA n a = lift1 (replicate n) a
 
 -- | Filter a list with a predicate that produces an effect.
 --
