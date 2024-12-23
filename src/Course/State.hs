@@ -44,8 +44,7 @@ exec ::
   State s a
   -> s
   -> s
-exec =
-  error "todo: Course.State#exec"
+exec  (State f) s = snd . f $ s
 
 -- | Run the `State` seeded with `s` and retrieve the resulting value.
 --
@@ -54,8 +53,7 @@ eval ::
   State s a
   -> s
   -> a
-eval =
-  error "todo: Course.State#eval"
+eval (State f) s = fst . f $ s
 
 -- | A `State` where the state also distributes into the produced value.
 --
@@ -63,8 +61,7 @@ eval =
 -- (0,0)
 get ::
   State s s
-get =
-  error "todo: Course.State#get"
+get = State (\x -> (x,x)) 
 
 -- | A `State` where the resulting state is seeded with the given value.
 --
@@ -73,8 +70,7 @@ get =
 put ::
   s
   -> State s ()
-put =
-  error "todo: Course.State#put"
+put s = State (\_ -> ((),s)) 
 
 -- | Implement the `Functor` instance for `State s`.
 --
@@ -85,8 +81,8 @@ instance Functor (State s) where
     (a -> b)
     -> State s a
     -> State s b
-  (<$>) =
-    error "todo: Course.State#(<$>)"
+  (<$>) f state =  State (\x -> (f . eval state $ x, exec state $ x) ) where f2 = runState state
+    
 
 -- | Implement the `Applicative` instance for `State s`.
 --
@@ -102,15 +98,14 @@ instance Applicative (State s) where
   pure ::
     a
     -> State s a
-  pure =
-    error "todo: Course.State pure#instance (State s)"
+  pure a = State (\s -> (a,s) )
   (<*>) ::
     State s (a -> b)
     -> State s a
     -> State s b
-  (<*>) =
-    error "todo: Course.State (<*>)#instance (State s)"
-
+  (<*>) stateFunc input = State (\s -> (f s (fst . inputF $ s ), exec input ( exec stateFunc s )) )  where 
+    f = eval stateFunc 
+    inputF = runState input
 -- | Implement the `Monad` instance for `State s`.
 --
 -- >>> runState ((const $ put 2) =<< put 1) 0
@@ -126,8 +121,11 @@ instance Monad (State s) where
     (a -> State s b)
     -> State s a
     -> State s b
-  (=<<) =
-    error "todo: Course.State (=<<)#instance (State s)"
+  (=<<) f input = State (\s -> ( eval (f (eval input s)) $ exec input s , exec (f (eval input s)) $ exec input s  ))
+
+   
+   
+
 
 -- | Find the first element in a `List` that satisfies a given predicate.
 -- It is possible that no element is found, hence an `Optional` result.
