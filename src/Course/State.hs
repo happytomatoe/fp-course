@@ -81,7 +81,7 @@ instance Functor (State s) where
     (a -> b)
     -> State s a
     -> State s b
-  (<$>) f state =  State (\x -> (f . eval state $ x, exec state $ x) ) where f2 = runState state
+  (<$>) f state =  State (\x -> (f . eval state $ x, exec state $ x) ) 
     
 
 -- | Implement the `Applicative` instance for `State s`.
@@ -103,9 +103,11 @@ instance Applicative (State s) where
     State s (a -> b)
     -> State s a
     -> State s b
-  (<*>) stateFunc input = State (\s -> (f s (fst . inputF $ s ), exec input ( exec stateFunc s )) )  where 
-    f = eval stateFunc 
-    inputF = runState input
+  (<*>) stateFunc input = State $ \s ->
+    let (f, s') = runState stateFunc s
+        (a, s'') = runState input s'
+    in (f a, s'')
+
 -- | Implement the `Monad` instance for `State s`.
 --
 -- >>> runState ((const $ put 2) =<< put 1) 0
@@ -121,12 +123,11 @@ instance Monad (State s) where
     (a -> State s b)
     -> State s a
     -> State s b
-  (=<<) f input = State (\s -> ( eval (f (eval input s)) $ exec input s , exec (f (eval input s)) $ exec input s  ))
-
-   
-   
-
-
+  (=<<) f state = State $ \s ->
+    let (a, s') = runState state s
+        (b, s'') = runState (f a) s'
+    in (b, s'')
+    
 -- | Find the first element in a `List` that satisfies a given predicate.
 -- It is possible that no element is found, hence an `Optional` result.
 -- However, while performing the search, we sequence some `Monad` effect through.
@@ -146,8 +147,10 @@ findM ::
   (a -> f Bool)
   -> List a
   -> f (Optional a)
-findM =
-  error "todo: Course.State#findM"
+findM _ Nil = pure Empty
+findM f (h :. t) =  do 
+  b <- f h
+  if b then pure (Full h) else findM f t
 
 -- | Find the first element in a `List` that repeats.
 -- It is possible that no element repeats, hence an `Optional` result.
@@ -163,8 +166,12 @@ firstRepeat ::
   Ord a =>
   List a
   -> Optional a
-firstRepeat =
-  error "todo: Course.State#firstRepeat"
+firstRepeat l = 
+  eval (findM (\x -> do
+    s <- get
+    put (S.insert x s)
+    pure (S.member x s)) l) S.empty
+
 
 -- | Remove all duplicate elements in a `List`.
 -- /Tip:/ Use `filtering` and `State` with a @Data.Set#Set@.
@@ -176,8 +183,9 @@ distinct ::
   Ord a =>
   List a
   -> List a
-distinct =
-  error "todo: Course.State#distinct"
+distinct l =  
+    let p e = State (\s -> (not $ S.member e s, S.insert e s)) in eval (filterM p $ l) S.empty
+
 
 -- | A happy number is a positive integer, where the sum of the square of its digits eventually reaches 1 after repetition.
 -- In contrast, a sad number (not a happy number) is where the sum of the square of its digits never reaches 1

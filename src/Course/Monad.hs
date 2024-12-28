@@ -145,6 +145,20 @@ join a = id =<< a
 
 infixl 1 >>=
 
+filterM ::
+  Monad m =>
+  (a -> m Bool)
+  -> List a
+  -> m (List a)
+filterM _ Nil = pure Nil
+filterM f (h :. t) = do
+    b <- f h 
+    if b then do
+      rest <- filterM f t
+      pure (h :. rest)  
+    else filterM f t 
+
+
 -- | Implement composition within the @Monad@ environment.
 -- Pronounced, Kleisli composition.
 --

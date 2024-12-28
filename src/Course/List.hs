@@ -172,12 +172,11 @@ filter f l = case l of
   -> List a
   -> List a
 (++) l1 l2 =  
-  -- delete last element from 1-st list and append all elems from 2-nd list
-  case (l1,l2) of 
-    (Nil,Nil) -> Nil
-    ((h :. t), Nil) -> h :. (t ++ Nil) 
-    (Nil,(h :. t)) -> h :. (Nil ++ t)
-    ((h1 :. t1),(h2 :. t2)) -> h1 :. (t1 ++ l2)
+  case (l1, l2) of 
+    (Nil, Nil) -> Nil
+    ((h :. t), Nil) -> h :. t
+    (Nil, (h :. t)) -> h :. t
+    ((h1 :. t1), _) -> h1 :. (t1 ++ l2)
     
 
 infixr 5 ++
@@ -315,8 +314,7 @@ lengthGT4 l = lengthGT4Inner l 5 > 4
 reverse ::
   List a
   -> List a
-reverse _ = error "Not implemented"
--- reverse Nil = Nil
+reverse = foldLeft (flip (:.)) Nil
 -- reverse (h:.t) = reverse t ++  h :. Nil
   --TODO: improve performance for large list
    
