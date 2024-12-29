@@ -98,7 +98,21 @@ instance Applicative Optional where
     -> Optional b
   (<*>) (Full f) (Full v) = Full (f v)
   (<*>) _ _ = Empty
+
+instance Applicative (Either e) where
+  pure ::
+    a
+    -> Either e a
+  pure = Right
+  (<*>) ::
+    Either e (a -> b)
+    -> Either e a
+    -> Either e b
+  (<*>) (Right f) (Right v) = Right (f v)
+  (<*>) (Left e) _ = Left e
+  (<*>) _ (Left e) = Left e
      
+
 -- | Insert into a constant function.
 --
 -- >>> ((+) <*> (+10)) 3

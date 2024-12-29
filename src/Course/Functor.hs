@@ -73,6 +73,15 @@ instance Functor Optional where
     Empty -> Empty 
     Full a -> Full (f a) 
 
+instance Functor (Either e) where
+  (<$>) ::
+    (a -> b)
+    -> Either e a
+    -> Either e b
+  (<$>) f o = case o of 
+    Left a -> Left a 
+    Right a -> Right (f a) 
+
 -- | Maps a function on the reader ((->) t) functor.
 --
 -- >>> ((+1) <$> (*2)) 8

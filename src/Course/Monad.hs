@@ -60,6 +60,15 @@ instance Monad Optional where
     -> Optional b
   (=<<) = bindOptional
 
+instance Monad (Either e) where
+  (=<<) ::
+    (a -> Either e b)
+    -> Either e a
+    -> Either e b
+  (=<<) f a = case a of 
+      Left a -> Left a 
+      Right a -> f a 
+
 -- | Binds a function on the reader ((->) t).
 --
 -- >>> ((*) =<< (+10)) 7
