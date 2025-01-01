@@ -718,3 +718,25 @@ instance A.Applicative List where
 instance P.Monad List where
   (>>=) =
     flip flatMap
+
+lastOr ::
+  a
+  -> List a
+  -> a
+lastOr def Nil =  def
+lastOr _ (h :. t) = lastOr h t
+
+
+lastOptional ::
+  List a
+  -> Optional a
+lastOptional Nil = Empty
+lastOptional (h:.Nil) = Full h
+lastOptional (h:.t) = lastOptional t
+
+partitionOnLast :: List a -> (List a, Optional a)
+partitionOnLast Nil = (Nil, Empty)
+partitionOnLast (h:.t) = case (partitionOnLast t) of 
+  (Nil, Empty) -> (Nil, Full h) --found last elem 
+  (l, Full a)  -> (h:.l, Full a)
+  (_,_) -> error "Something unexpected happened"

@@ -79,8 +79,7 @@ instance Contravariant Predicate where
     (b -> a)
     -> Predicate a
     -> Predicate b
-  (>$<) =
-    error "todo: Course.Contravariant (>$<)#instance Predicate"
+  (>$<) f a = Predicate (\v -> runPredicate a (f v))
 
 -- | Use the function before comparing.
 --
@@ -91,9 +90,8 @@ instance Contravariant Comparison where
     (b -> a)
     -> Comparison a
     -> Comparison b
-  (>$<) =
-    error "todo: Course.Contravariant (>$<)#instance Comparison"
-
+  (>$<) f a = Comparison (\v1 v2 -> (runComparison a) (f v1) (f v2) )
+ 
 -- | The kind of the argument to 'Contravariant' is @Type -> Type@, so
 -- our '(>$<)' only works on the final type argument. The
 -- 'SwappedArrow' type reverses the arguments, which gives us the
@@ -106,8 +104,7 @@ instance Contravariant (SwappedArrow t) where
     (b -> a)
     -> SwappedArrow x a
     -> SwappedArrow x b
-  (>$<) =
-    error "todo: Course.Contravariant (>$<)#instance SwappedArrow"
+  (>$<) f a =  SwappedArrow $ \b -> (runSwappedArrow a) (f b)    
 
 
 -- | If we give our 'Contravariant' an @a@, then we can "accept" any
@@ -119,5 +116,4 @@ instance Contravariant (SwappedArrow t) where
   a
   -> k a
   -> k b
-(>$) =
-  error "todo: Course.Contravariant#(>$)"
+(>$) a ka = (\_ -> a) >$< ka
